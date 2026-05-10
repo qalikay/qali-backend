@@ -35,10 +35,9 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- Base de datos H2 (en memoria, perfecta para desarrollo y demo) -->
         <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
         </dependency>
 
