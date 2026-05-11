@@ -1,13 +1,16 @@
 package com.qalikay.backend.controllers;
 
 import com.qalikay.backend.dtos.ClienteDTO;
+import com.qalikay.backend.entities.Categoria;
 import com.qalikay.backend.entities.Cliente;
 import com.qalikay.backend.services.ClienteService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
@@ -60,5 +63,38 @@ public class ClienteController {
         ClienteDTO dto = modelMapper.map(mod, ClienteDTO.class);
         dto.setUsername(mod.getUser().getUsername());
         return ResponseEntity.ok(dto);
+    }
+
+    @PostMapping("/clientes")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ClienteDTO> crear(@RequestBody ClienteDTO clientedto) {
+
+        Cliente cliente = new Cliente();
+
+        cliente.setNombres(clientedto.getNombres());
+        cliente.setApellidos(clientedto.getApellidos());
+        cliente.setTelefono(clientedto.getTelefono());
+
+        Cliente cli = clienteService.buscarPorUsername(clientedto.getUsername());
+
+        if (cli == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        cliente.setUser(cli.getUser());
+
+        Cliente creado = clienteService.insertar(cliente);
+
+        ClienteDTO response = modelMapper.map(creado, ClienteDTO.class);
+        response.setUsername(creado.getUser().getUsername());
+
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/clientes/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+        clienteService.eliminar(id);
+        return ResponseEntity.noContent().build();
     }
 }
