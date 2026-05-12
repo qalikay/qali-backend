@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 @RestController
 @CrossOrigin(origins = "${ip.frontend}", allowCredentials = "true", exposedHeaders = "Authorization")
 @RequestMapping("/api")
-public class ExpertoController {
+public class  ExpertoController {
 
     @Autowired
     private ExpertoService expertoService;
