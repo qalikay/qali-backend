@@ -32,6 +32,12 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Endpoints publicos de autenticacion y registro.
+ *  - POST /api/authenticate    -> valida usuario+password, devuelve JWT
+ *  - POST /api/registro/cliente -> alta de cliente
+ *  - POST /api/registro/experto -> alta de experto
+ */
 @CrossOrigin(origins = "${ip.frontend}", allowCredentials = "true", exposedHeaders = "Authorization")
 @RestController
 @RequestMapping("/api")
@@ -70,13 +76,17 @@ public class AuthController {
         this.passwordEncoder = passwordEncoder;
     }
 
+    // POST /api/authenticate -> recibe {username,password} y devuelve {jwt, username, roles}
     @PostMapping("/authenticate")
     public ResponseEntity<AuthResponseDTO> authenticate(@RequestBody AuthRequestDTO authRequest) {
+        // 1) Spring valida credenciales contra la BD (lanza excepcion si son incorrectas)
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
         );
 
+        // 2) Carga el UserDetails (username + roles)
         final UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getUsername());
+        // 3) Genera el JWT firmado
         final String token = jwtUtil.generateToken(userDetails);
 
         Set<String> roles = userDetails.getAuthorities()
@@ -84,6 +94,7 @@ public class AuthController {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toSet());
 
+        // Tambien lo devolvemos en el header para clientes que lo lean ahi
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set("Authorization", "Bearer " + token);
 
@@ -95,14 +106,17 @@ public class AuthController {
         return ResponseEntity.ok().headers(responseHeaders).body(response);
     }
 
+    // POST /api/registro/cliente -> crea User + Cliente y le asigna ROLE_CLIENTE
     @PostMapping("/registro/cliente")
     public ResponseEntity<?> registrarCliente(@RequestBody RegistroClienteDTO dto) {
         if (userService.existePorUsername(dto.getUsername())) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("El usuario ya existe");
         }
+        // Busca el rol; si no existe lo crea (defensivo)
         Role rol = roleRepository.findByName("ROLE_CLIENTE")
                 .orElseGet(() -> roleRepository.save(new Role(null, "ROLE_CLIENTE")));
 
+        // 1) Guardar credenciales (password siempre hasheada con BCrypt)
         User user = new User();
         user.setUsername(dto.getUsername());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
@@ -111,6 +125,7 @@ public class AuthController {
         user.setRoles(roles);
         user = userRepository.save(user);
 
+        // 2) Guardar perfil de cliente asociado al user recien creado
         Cliente cliente = new Cliente();
         cliente.setNombres(dto.getNombres());
         cliente.setApellidos(dto.getApellidos());
@@ -121,6 +136,7 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body("Cliente registrado correctamente");
     }
 
+    // POST /api/registro/experto -> crea User + Experto y le asigna ROLE_EXPERTO
     @PostMapping("/registro/experto")
     public ResponseEntity<?> registrarExperto(@RequestBody RegistroExpertoDTO dto) {
         if (userService.existePorUsername(dto.getUsername())) {
@@ -137,6 +153,7 @@ public class AuthController {
         user.setRoles(roles);
         user = userRepository.save(user);
 
+        // Carga la especialidad si vino el id (puede registrarse sin especialidad)
         Especialidad especialidad = null;
         if (dto.getEspecialidadId() != null) {
             especialidad = especialidadRepositorio.findById(dto.getEspecialidadId()).orElse(null);

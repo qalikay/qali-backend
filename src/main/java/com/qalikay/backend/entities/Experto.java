@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+// Perfil de experto (curandero/herbolario). Publica recetas e insumos y responde consultas.
 @Setter
 @Getter
 @NoArgsConstructor
@@ -27,15 +28,17 @@ public class Experto {
 
     private String telefono;
 
-    @Column(length = 1000)
+    @Column(length = 1000)                  // VARCHAR(1000) para texto biografico largo
     private String trayectoria;
 
     private Integer anosExperiencia;
 
+    // Relacion N-a-1: muchos expertos pueden tener la misma especialidad
     @ManyToOne
-    @JoinColumn(name = "especialidad_id")
+    @JoinColumn(name = "especialidad_id")   // FK = expertos.especialidad_id
     private Especialidad especialidad;
 
+    // Relacion 1-a-1 con User (credenciales)
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;

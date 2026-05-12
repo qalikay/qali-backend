@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+// Especialidad de un Experto (Medicina natural andina, Herbolaria amazonica, etc.)
 @Setter
 @Getter
 @NoArgsConstructor
@@ -18,7 +19,7 @@ public class Especialidad {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true)             // No se permiten especialidades duplicadas
     private String nombre;
 
     @Column(length = 500)

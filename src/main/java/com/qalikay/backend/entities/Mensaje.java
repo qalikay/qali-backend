@@ -9,6 +9,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+// Mensaje individual dentro de una Consulta (chat cliente-experto).
 @Setter
 @Getter
 @NoArgsConstructor
@@ -30,8 +31,9 @@ public class Mensaje {
 
     private LocalDateTime fechaEnvio = LocalDateTime.now();
 
+    // Evita el bucle infinito al serializar (Consulta -> mensajes -> consulta -> ...)
     @JsonBackReference
     @ManyToOne
-    @JoinColumn(name = "consulta_id")
+    @JoinColumn(name = "consulta_id")            // FK a consultas.id
     private Consulta consulta;
 }

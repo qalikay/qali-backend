@@ -13,6 +13,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * CRUD de especialidades. Mismas reglas que CategoriaController:
+ *  - GET publicos
+ *  - POST/PUT/DELETE solo ROLE_ADMIN
+ */
 @RestController
 @CrossOrigin(origins = "${ip.frontend}", allowCredentials = "true", exposedHeaders = "Authorization")
 @RequestMapping("/api")

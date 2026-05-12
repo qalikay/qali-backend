@@ -17,6 +17,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Endpoints de Ordenes (compras).
+ *  - Crear / listar lo propio: ROLE_CLIENTE
+ *  - Cambiar estado: ROLE_ADMIN
+ */
 @RestController
 @CrossOrigin(origins = "${ip.frontend}", allowCredentials = "true", exposedHeaders = "Authorization")
 @RequestMapping("/api")
@@ -25,6 +30,7 @@ public class OrdenController {
     @Autowired private OrdenService ordenService;
     @Autowired private ModelMapper modelMapper;
 
+    // POST /api/ordenes -> el service calcula totales y guarda la orden + detalles
     @PostMapping("/ordenes")
     @PreAuthorize("hasRole('CLIENTE')")
     public ResponseEntity<OrdenDTO> crear(@RequestBody CrearOrdenDTO dto,
@@ -33,6 +39,7 @@ public class OrdenController {
         return new ResponseEntity<>(modelMapper.map(o, OrdenDTO.class), HttpStatus.CREATED);
     }
 
+    // GET /api/cliente/ordenes -> historial de compras del cliente autenticado
     @GetMapping("/cliente/ordenes")
     @PreAuthorize("hasRole('CLIENTE')")
     public List<OrdenDTO> misOrdenes(@AuthenticationPrincipal UserDetails userDetails) {
@@ -41,6 +48,7 @@ public class OrdenController {
                 .collect(Collectors.toList());
     }
 
+    // GET /api/ordenes/{id} -> cualquier autenticado puede ver el detalle si conoce el id
     @GetMapping("/ordenes/{id}")
     public ResponseEntity<OrdenDTO> buscarPorId(@PathVariable Long id) {
         Orden o = ordenService.buscarPorId(id);
@@ -48,6 +56,7 @@ public class OrdenController {
         return ResponseEntity.ok(modelMapper.map(o, OrdenDTO.class));
     }
 
+    // POST /api/ordenes/{id}/estado -> ADMIN marca la orden como PAGADA / CANCELADA
     @PostMapping("/ordenes/{id}/estado")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<OrdenDTO> cambiarEstado(@PathVariable Long id,

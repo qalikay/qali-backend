@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+// Insumo / producto natural (hojas, aceites, extractos) que vende un Experto.
 @Setter
 @Getter
 @NoArgsConstructor
@@ -25,8 +26,8 @@ public class Insumo {
     private String descripcion;
 
     private Double precio;
-    private Integer stock;
-    private String unidad;
+    private Integer stock;                       // Cantidad disponible
+    private String unidad;                       // "paquete 50g", "frasco 30ml", etc.
 
     /** "HIERBA", "ACEITE", "EXTRACTO", "POLVO", "OTRO" */
     private String tipo;
@@ -38,10 +39,10 @@ public class Insumo {
     private String estado = "DISPONIBLE";
 
     @ManyToOne
-    @JoinColumn(name = "categoria_id")
+    @JoinColumn(name = "categoria_id")           // FK a categorias.id
     private Categoria categoria;
 
     @ManyToOne
-    @JoinColumn(name = "experto_id")
+    @JoinColumn(name = "experto_id")             // FK a expertos.id (vendedor)
     private Experto experto;
 }

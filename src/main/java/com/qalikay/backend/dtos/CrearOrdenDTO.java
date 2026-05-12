@@ -7,11 +7,12 @@ import lombok.Setter;
 
 import java.util.List;
 
+// Body que recibe POST /api/ordenes. El service calcula totales a partir de los detalles.
 @Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class CrearOrdenDTO {
-    private String metodoPago;
-    private List<DetalleOrdenDTO> detalles;
+    private String metodoPago;                  // "TARJETA" | "YAPE" | "PLIN" | "EFECTIVO"
+    private List<DetalleOrdenDTO> detalles;     // Items a comprar (recetas o insumos)
 }

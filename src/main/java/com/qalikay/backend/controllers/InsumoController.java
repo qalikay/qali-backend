@@ -17,6 +17,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Endpoints de Insumos (productos).
+ *  - GET son publicos con filtros por categoria, tipo y nombre
+ *  - CRUD bajo /api/experto/insumos solo ROLE_EXPERTO
+ */
 @RestController
 @CrossOrigin(origins = "${ip.frontend}", allowCredentials = "true", exposedHeaders = "Authorization")
 @RequestMapping("/api")
@@ -26,6 +31,7 @@ public class InsumoController {
     @Autowired private ExpertoService expertoService;
     @Autowired private ModelMapper modelMapper;
 
+    // GET /api/insumos[?categoriaId=&tipo=&q=]  Filtros opcionales (solo uno se aplica por request)
     @GetMapping("/insumos")
     public List<InsumoDTO> listar(@RequestParam(required = false) Long categoriaId,
                                   @RequestParam(required = false) String tipo,
@@ -43,6 +49,7 @@ public class InsumoController {
         return lista.stream().map(this::toDTO).collect(Collectors.toList());
     }
 
+    // GET /api/insumos/{id} -> detalle publico
     @GetMapping("/insumos/{id}")
     public ResponseEntity<InsumoDTO> buscarPorId(@PathVariable Long id) {
         Insumo i = insumoService.buscarPorId(id);
@@ -52,6 +59,7 @@ public class InsumoController {
 
     // ----------------- ENDPOINTS DEL EXPERTO -----------------
 
+    // GET /api/experto/insumos -> insumos que vende el experto autenticado
     @GetMapping("/experto/insumos")
     @PreAuthorize("hasRole('EXPERTO')")
     public List<InsumoDTO> misInsumos(@AuthenticationPrincipal UserDetails userDetails) {
@@ -86,6 +94,7 @@ public class InsumoController {
         return ResponseEntity.noContent().build();
     }
 
+    // Mapeo manual del username (no lo cubre ModelMapper porque va anidado)
     private InsumoDTO toDTO(Insumo i) {
         InsumoDTO dto = modelMapper.map(i, InsumoDTO.class);
         if (i.getExperto() != null && i.getExperto().getUser() != null && dto.getExperto() != null) {

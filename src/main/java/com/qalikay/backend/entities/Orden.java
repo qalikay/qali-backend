@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+// Orden de compra creada por un Cliente. Agrupa varios DetalleOrden (items comprados).
 @Setter
 @Getter
 @NoArgsConstructor
@@ -24,7 +25,7 @@ public class Orden {
 
     private LocalDateTime fecha = LocalDateTime.now();
 
-    private Double total;
+    private Double total;                        // Suma de subtotales (la calcula el service)
 
     /** "PENDIENTE", "PAGADA", "CANCELADA" */
     @Column(nullable = false)
@@ -37,6 +38,8 @@ public class Orden {
     @JoinColumn(name = "cliente_id")
     private Cliente cliente;
 
+    // 1-a-N: una orden tiene varias lineas (DetalleOrden). Cascade + orphanRemoval
+    // hacen que detalles se guarden/borren junto con la orden.
     @OneToMany(mappedBy = "orden", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DetalleOrden> detalles = new ArrayList<>();
 }

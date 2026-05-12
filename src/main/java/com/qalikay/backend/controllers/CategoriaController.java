@@ -13,6 +13,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * CRUD de categorias.
+ *  - GET son publicos
+ *  - POST/PUT/DELETE solo ROLE_ADMIN
+ */
 @RestController
 @CrossOrigin(origins = "${ip.frontend}", allowCredentials = "true", exposedHeaders = "Authorization")
 @RequestMapping("/api")
@@ -22,8 +27,9 @@ public class CategoriaController {
     private CategoriaService categoriaService;
 
     @Autowired
-    private ModelMapper modelMapper;
+    private ModelMapper modelMapper;     // Convierte Entidad -> DTO sin escribir mapeos manuales
 
+    // GET /api/categorias -> lista todas (publico)
     @GetMapping("/categorias")
     public List<CategoriaDTO> listar() {
         return categoriaService.listar().stream()
@@ -31,6 +37,7 @@ public class CategoriaController {
                 .collect(Collectors.toList());
     }
 
+    // GET /api/categorias/{id} -> detalle (publico)
     @GetMapping("/categorias/{id}")
     public ResponseEntity<CategoriaDTO> buscarPorId(@PathVariable Long id) {
         Categoria c = categoriaService.buscarPorId(id);
@@ -38,6 +45,7 @@ public class CategoriaController {
         return ResponseEntity.ok(modelMapper.map(c, CategoriaDTO.class));
     }
 
+    // POST /api/categoria -> crea categoria (solo ADMIN). @PreAuthorize valida el rol del JWT.
     @PostMapping("/categoria")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CategoriaDTO> crear(@RequestBody Categoria categoria) {
@@ -45,6 +53,7 @@ public class CategoriaController {
         return new ResponseEntity<>(modelMapper.map(creada, CategoriaDTO.class), HttpStatus.CREATED);
     }
 
+    // PUT /api/categoria -> actualiza (solo ADMIN)
     @PutMapping("/categoria")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CategoriaDTO> actualizar(@RequestBody Categoria categoria) {
@@ -53,10 +62,11 @@ public class CategoriaController {
         return ResponseEntity.ok(modelMapper.map(mod, CategoriaDTO.class));
     }
 
+    // DELETE /api/categoria/{id} -> elimina (solo ADMIN)
     @DeleteMapping("/categoria/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         categoriaService.eliminar(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.noContent().build();    // 204
     }
 }

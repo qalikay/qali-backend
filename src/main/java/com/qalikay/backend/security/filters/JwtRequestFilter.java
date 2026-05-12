@@ -34,30 +34,35 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
+        // 1) Leer el header Authorization
         final String authorizationHeader = request.getHeader("Authorization");
 
         String username = null;
         String jwt = null;
 
+        // 2) Si viene con formato "Bearer <token>", extraer el JWT
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            jwt = authorizationHeader.substring(7);
+            jwt = authorizationHeader.substring(7);                       // quita "Bearer "
             try {
-                username = jwtUtil.extractUsername(jwt);
+                username = jwtUtil.extractUsername(jwt);                  // parsea y extrae "sub"
             } catch (Exception ex) {
                 // Token invalido o expirado: dejamos pasar sin autenticar
             }
         }
 
+        // 3) Si el token es valido y aun no hay autenticacion en el contexto, autenticar
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
             if (jwtUtil.validateToken(jwt, userDetails)) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                // Marca este request como autenticado: ahora @PreAuthorize puede leer el rol
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
 
+        // 4) Continua con el resto de filtros / controller
         chain.doFilter(request, response);
     }
 }

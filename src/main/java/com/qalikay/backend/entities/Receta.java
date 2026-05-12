@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 
+// Receta natural creada por un Experto. Solo las PUBLICADA se muestran al publico.
 @Setter
 @Getter
 @NoArgsConstructor
@@ -26,7 +27,7 @@ public class Receta {
     @Column(length = 500)
     private String descripcion;
 
-    @Column(length = 4000)
+    @Column(length = 4000)                       // Texto largo para receta completa
     private String ingredientes;
 
     @Column(length = 4000)
@@ -41,14 +42,16 @@ public class Receta {
 
     /** "BORRADOR" o "PUBLICADA" */
     @Column(nullable = false)
-    private String estado = "BORRADOR";
+    private String estado = "BORRADOR";          // Valor por defecto cuando se crea
 
     private LocalDate fechaCreacion = LocalDate.now();
 
+    // N-a-1: una receta pertenece a una categoria; una categoria tiene varias recetas
     @ManyToOne
     @JoinColumn(name = "categoria_id")
     private Categoria categoria;
 
+    // N-a-1: cada receta es autoria de un experto
     @ManyToOne
     @JoinColumn(name = "experto_id")
     private Experto experto;

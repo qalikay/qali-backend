@@ -17,6 +17,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Endpoints del perfil de Cliente.
+ *  - /cliente/me      -> ROLE_CLIENTE consulta/edita SU propio perfil
+ *  - /clientes         -> ROLE_ADMIN administra la lista de clientes
+ */
 @RestController
 @CrossOrigin(origins = "${ip.frontend}", allowCredentials = "true", exposedHeaders = "Authorization")
 @RequestMapping("/api")
@@ -28,6 +33,7 @@ public class ClienteController {
     @Autowired
     private ModelMapper modelMapper;
 
+    // GET /api/clientes -> listado global (solo ADMIN)
     @GetMapping("/clientes")
     @PreAuthorize("hasRole('ADMIN')")
     public List<ClienteDTO> listar() {
@@ -40,6 +46,7 @@ public class ClienteController {
                 .collect(Collectors.toList());
     }
 
+    // GET /api/cliente/me -> perfil del cliente autenticado (sin id en URL, lo saca del JWT)
     @GetMapping("/cliente/me")
     @PreAuthorize("hasRole('CLIENTE')")
     public ResponseEntity<ClienteDTO> miPerfil(@AuthenticationPrincipal UserDetails userDetails) {
@@ -50,12 +57,14 @@ public class ClienteController {
         return ResponseEntity.ok(dto);
     }
 
+    // PUT /api/cliente/me -> actualizacion parcial: solo cambia los campos no nulos del body
     @PutMapping("/cliente/me")
     @PreAuthorize("hasRole('CLIENTE')")
     public ResponseEntity<ClienteDTO> actualizarMiPerfil(@AuthenticationPrincipal UserDetails userDetails,
                                                          @RequestBody Cliente cambios) {
         Cliente cliente = clienteService.buscarPorUsername(userDetails.getUsername());
         if (cliente == null) return ResponseEntity.notFound().build();
+        // Patron de update parcial: si el campo viene null, mantenemos el valor actual
         cliente.setNombres(cambios.getNombres() != null ? cambios.getNombres() : cliente.getNombres());
         cliente.setApellidos(cambios.getApellidos() != null ? cambios.getApellidos() : cliente.getApellidos());
         cliente.setTelefono(cambios.getTelefono() != null ? cambios.getTelefono() : cliente.getTelefono());

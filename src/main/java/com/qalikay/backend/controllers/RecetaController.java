@@ -17,6 +17,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Endpoints de Recetas.
+ *  - /api/recetas         -> publico, solo muestra estado=PUBLICADA
+ *  - /api/experto/recetas -> ROLE_EXPERTO, ve y administra solo SUS recetas
+ */
 @RestController
 @CrossOrigin(origins = "${ip.frontend}", allowCredentials = "true", exposedHeaders = "Authorization")
 @RequestMapping("/api")
@@ -33,20 +38,22 @@ public class RecetaController {
 
     // ----------------- ENDPOINTS PUBLICOS -----------------
 
+    // GET /api/recetas[?categoriaId=&q=]   Filtros opcionales por categoria o por titulo.
     @GetMapping("/recetas")
     public List<RecetaDTO> listar(@RequestParam(required = false) Long categoriaId,
                                   @RequestParam(required = false) String q) {
         List<Receta> recetas;
         if (q != null && !q.isBlank()) {
-            recetas = recetaService.buscarPublicadasPorTitulo(q);
+            recetas = recetaService.buscarPublicadasPorTitulo(q);          // Filtro por busqueda
         } else if (categoriaId != null) {
             recetas = recetaService.listarPublicadasPorCategoria(categoriaId);
         } else {
-            recetas = recetaService.listarPublicadas();
+            recetas = recetaService.listarPublicadas();                    // Por defecto: todas las PUBLICADA
         }
         return recetas.stream().map(this::toDTO).collect(Collectors.toList());
     }
 
+    // GET /api/recetas/{id} -> solo si esta PUBLICADA, sino 404
     @GetMapping("/recetas/{id}")
     public ResponseEntity<RecetaDTO> buscarPorId(@PathVariable Long id) {
         Receta r = recetaService.buscarPorId(id);
@@ -58,6 +65,8 @@ public class RecetaController {
 
     // ----------------- ENDPOINTS DEL EXPERTO -----------------
 
+    // GET /api/experto/recetas -> recetas del experto autenticado (todas, sin importar estado)
+    // @AuthenticationPrincipal: Spring inyecta el UserDetails que cargo el JwtRequestFilter
     @GetMapping("/experto/recetas")
     @PreAuthorize("hasRole('EXPERTO')")
     public List<RecetaDTO> misRecetas(@AuthenticationPrincipal UserDetails userDetails) {
@@ -68,12 +77,14 @@ public class RecetaController {
                 .collect(Collectors.toList());
     }
 
+    // GET /api/experto/recetas/{id} -> el experto solo puede ver su propia receta (403 si no)
     @GetMapping("/experto/recetas/{id}")
     @PreAuthorize("hasRole('EXPERTO')")
     public ResponseEntity<RecetaDTO> miReceta(@PathVariable Long id,
                                               @AuthenticationPrincipal UserDetails userDetails) {
         Receta r = recetaService.buscarPorId(id);
         if (r == null) return ResponseEntity.notFound().build();
+        // Verifica que la receta sea del experto autenticado (defensa adicional al @PreAuthorize)
         if (r.getExperto() == null || r.getExperto().getUser() == null
                 || !r.getExperto().getUser().getUsername().equals(userDetails.getUsername())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
@@ -81,6 +92,7 @@ public class RecetaController {
         return ResponseEntity.ok(toDTO(r));
     }
 
+    // POST /api/experto/recetas -> crea receta vinculada al experto autenticado (estado = BORRADOR)
     @PostMapping("/experto/recetas")
     @PreAuthorize("hasRole('EXPERTO')")
     public ResponseEntity<RecetaDTO> crear(@RequestBody CrearRecetaDTO dto,
@@ -89,6 +101,7 @@ public class RecetaController {
         return new ResponseEntity<>(toDTO(creada), HttpStatus.CREATED);
     }
 
+    // PUT /api/experto/recetas/{id} -> actualiza una receta (el service valida la propiedad)
     @PutMapping("/experto/recetas/{id}")
     @PreAuthorize("hasRole('EXPERTO')")
     public ResponseEntity<RecetaDTO> modificar(@PathVariable Long id,
@@ -98,6 +111,7 @@ public class RecetaController {
         return ResponseEntity.ok(toDTO(mod));
     }
 
+    // POST /api/experto/recetas/{id}/publicar -> cambia estado BORRADOR -> PUBLICADA
     @PostMapping("/experto/recetas/{id}/publicar")
     @PreAuthorize("hasRole('EXPERTO')")
     public ResponseEntity<RecetaDTO> publicar(@PathVariable Long id,
@@ -105,6 +119,7 @@ public class RecetaController {
         return ResponseEntity.ok(toDTO(recetaService.publicar(id, userDetails.getUsername())));
     }
 
+    // POST /api/experto/recetas/{id}/archivar -> vuelve a estado BORRADOR (oculta del publico)
     @PostMapping("/experto/recetas/{id}/archivar")
     @PreAuthorize("hasRole('EXPERTO')")
     public ResponseEntity<RecetaDTO> archivar(@PathVariable Long id,
@@ -122,6 +137,7 @@ public class RecetaController {
 
     // ----------------- helpers -----------------
 
+    // Convierte Receta -> RecetaDTO y agrega el username del experto (no lo mapea ModelMapper)
     private RecetaDTO toDTO(Receta r) {
         RecetaDTO dto = modelMapper.map(r, RecetaDTO.class);
         if (r.getExperto() != null && r.getExperto().getUser() != null && dto.getExperto() != null) {

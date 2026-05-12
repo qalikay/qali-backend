@@ -18,16 +18,24 @@ import org.springframework.stereotype.Component;
 
 import java.util.Set;
 
+/**
+ * Bean tipo "seed de seguridad": al arrancar la app crea los roles base y los
+ * usuarios demo (admin/cliente/experto) SI no existen. Convive con import.sql:
+ * import.sql ya inserta estos datos en BD, asi que aqui los existsBy... evitan duplicados.
+ *
+ * CommandLineRunner -> run() se ejecuta automaticamente al terminar de arrancar Spring.
+ */
 @Component
 public class DataInitializer implements CommandLineRunner {
 
+    // Repositorios inyectados por constructor (mejor practica que @Autowired en campo)
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
     private final ClienteRepositorio clienteRepositorio;
     private final ExpertoRepositorio expertoRepositorio;
     private final CategoriaRepositorio categoriaRepositorio;
     private final EspecialidadRepositorio especialidadRepositorio;
-    private final PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;     // BCrypt, para hashear la password
 
     public DataInitializer(RoleRepository roleRepository,
                            UserRepository userRepository,
@@ -45,20 +53,25 @@ public class DataInitializer implements CommandLineRunner {
         this.passwordEncoder = passwordEncoder;
     }
 
+    // Punto de entrada: se ejecuta una vez tras el arranque
     @Override
     public void run(String... args) {
+        // 1) Roles base de Spring Security
         Role adminRole = obtenerOCrearRol("ROLE_ADMIN");
         Role clienteRole = obtenerOCrearRol("ROLE_CLIENTE");
         Role expertoRole = obtenerOCrearRol("ROLE_EXPERTO");
 
+        // 2) Catalogos minimos
         crearCategorias();
         Especialidad especialidad = obtenerOCrearEspecialidad();
 
+        // 3) Usuarios demo (admin/cliente/experto) si aun no existen
         crearAdmin(adminRole);
         crearClienteDemo(clienteRole);
         crearExpertoDemo(expertoRole, especialidad);
     }
 
+    // Patron "get or create": evita duplicar si ya existe el rol
     private Role obtenerOCrearRol(String name) {
         return roleRepository.findByName(name)
                 .orElseGet(() -> roleRepository.save(new Role(null, name)));
@@ -94,11 +107,12 @@ public class DataInitializer implements CommandLineRunner {
                 .orElseThrow();
     }
 
+    // Crea el usuario admin con BCrypt. Si ya existe (lo creo import.sql), no hace nada.
     private void crearAdmin(Role role) {
         if (!userRepository.existsByUsername("admin")) {
             User user = new User();
             user.setUsername("admin");
-            user.setPassword(passwordEncoder.encode("admin123"));
+            user.setPassword(passwordEncoder.encode("admin123"));    // Hash en runtime
             user.setRoles(Set.of(role));
             userRepository.save(user);
         }

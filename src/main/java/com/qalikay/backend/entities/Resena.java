@@ -8,6 +8,8 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+// Resena que un Cliente deja sobre una Receta, un Insumo o un Experto.
+// Igual que DetalleOrden, usamos tipoItem + itemId para apuntar a distintas tablas.
 @Setter
 @Getter
 @NoArgsConstructor
@@ -22,7 +24,7 @@ public class Resena {
 
     /** 1 a 5 */
     @Column(nullable = false)
-    private Integer calificacion;
+    private Integer calificacion;                // Estrellas
 
     @Column(length = 1000)
     private String comentario;
@@ -32,11 +34,11 @@ public class Resena {
     private String tipoItem;
 
     @Column(nullable = false)
-    private Long itemId;
+    private Long itemId;                         // ID del item resenado
 
     private LocalDateTime fechaCreacion = LocalDateTime.now();
 
     @ManyToOne
-    @JoinColumn(name = "cliente_id")
+    @JoinColumn(name = "cliente_id")             // Autor de la resena
     private Cliente cliente;
 }

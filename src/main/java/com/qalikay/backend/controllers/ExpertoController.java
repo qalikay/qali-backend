@@ -14,6 +14,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Endpoints de Expertos.
+ *  - /expertos         publico (lista + detalle)
+ *  - /experto/me       ROLE_EXPERTO (consulta/edita su propio perfil)
+ */
 @RestController
 @CrossOrigin(origins = "${ip.frontend}", allowCredentials = "true", exposedHeaders = "Authorization")
 @RequestMapping("/api")
@@ -25,6 +30,7 @@ public class  ExpertoController {
     @Autowired
     private ModelMapper modelMapper;
 
+    // GET /api/expertos[?especialidadId=] -> directorio publico de expertos
     @GetMapping("/expertos")
     public List<ExpertoDTO> listar(@RequestParam(required = false) Long especialidadId) {
         List<Experto> expertos = especialidadId == null

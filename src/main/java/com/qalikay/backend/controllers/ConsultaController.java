@@ -19,6 +19,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Endpoints de Consultas (chat cliente-experto).
+ *  - El cliente CREA la consulta (POST /api/consultas)
+ *  - Ambos pueden agregar mensajes y cerrarla
+ */
 @RestController
 @CrossOrigin(origins = "${ip.frontend}", allowCredentials = "true", exposedHeaders = "Authorization")
 @RequestMapping("/api")
@@ -27,6 +32,7 @@ public class ConsultaController {
     @Autowired private ConsultaService consultaService;
     @Autowired private ModelMapper modelMapper;
 
+    // GET /api/cliente/consultas -> consultas iniciadas por el cliente autenticado
     @GetMapping("/cliente/consultas")
     @PreAuthorize("hasRole('CLIENTE')")
     public List<ConsultaDTO> misConsultasCliente(@AuthenticationPrincipal UserDetails userDetails) {
@@ -35,6 +41,7 @@ public class ConsultaController {
                 .collect(Collectors.toList());
     }
 
+    // GET /api/experto/consultas -> consultas que recibio el experto autenticado
     @GetMapping("/experto/consultas")
     @PreAuthorize("hasRole('EXPERTO')")
     public List<ConsultaDTO> misConsultasExperto(@AuthenticationPrincipal UserDetails userDetails) {
@@ -43,6 +50,7 @@ public class ConsultaController {
                 .collect(Collectors.toList());
     }
 
+    // GET /api/consultas/{id} -> detalle con mensajes (cualquier autenticado)
     @GetMapping("/consultas/{id}")
     public ResponseEntity<ConsultaDTO> buscarPorId(@PathVariable Long id) {
         Consulta c = consultaService.buscarPorId(id);
@@ -50,6 +58,7 @@ public class ConsultaController {
         return ResponseEntity.ok(modelMapper.map(c, ConsultaDTO.class));
     }
 
+    // POST /api/consultas -> el cliente crea una consulta nueva. El service tambien guarda el mensaje inicial.
     @PostMapping("/consultas")
     @PreAuthorize("hasRole('CLIENTE')")
     public ResponseEntity<ConsultaDTO> crear(@RequestBody CrearConsultaDTO dto,
@@ -58,6 +67,7 @@ public class ConsultaController {
         return new ResponseEntity<>(modelMapper.map(c, ConsultaDTO.class), HttpStatus.CREATED);
     }
 
+    // POST /api/consultas/{id}/mensajes -> agrega un mensaje al hilo (Map para body simple {"contenido":"..."})
     @PostMapping("/consultas/{id}/mensajes")
     public ResponseEntity<MensajeDTO> agregarMensaje(@PathVariable Long id,
                                                      @RequestBody Map<String, String> body,
@@ -67,6 +77,7 @@ public class ConsultaController {
         return new ResponseEntity<>(modelMapper.map(m, MensajeDTO.class), HttpStatus.CREATED);
     }
 
+    // POST /api/consultas/{id}/cerrar -> marca estado=CERRADA. Lo puede hacer cliente o experto.
     @PostMapping("/consultas/{id}/cerrar")
     public ResponseEntity<ConsultaDTO> cerrar(@PathVariable Long id,
                                               @AuthenticationPrincipal UserDetails userDetails) {

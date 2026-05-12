@@ -10,6 +10,7 @@ import lombok.Setter;
 import java.util.HashSet;
 import java.util.Set;
 
+// Entidad de credenciales. Cada User tiene asociado un Cliente O un Experto (perfil).
 @Setter
 @Getter
 @NoArgsConstructor
@@ -22,13 +23,16 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true)         // username unico en la BD
     private String username;
 
-    @JsonIgnore
+    @JsonIgnore                                       // Nunca expongas el hash de password en la API
     @Column(nullable = false)
-    private String password;
+    private String password;                          // Almacenado con BCrypt, NUNCA en texto plano
 
+    // Un usuario puede tener varios roles (ej. ROLE_ADMIN + ROLE_CLIENTE).
+    // EAGER: se cargan junto con el User (Spring Security los necesita en el login).
+    // JoinTable: tabla intermedia user_roles(user_id, role_id).
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_roles",
