@@ -73,6 +73,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/especialidades", "/api/especialidades/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/recetas", "/api/recetas/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/insumos", "/api/insumos/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/expertos", "/api/expertos/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/resenas").permitAll()
                         // El resto requiere JWT valido (y rol especifico via @PreAuthorize)
                         .anyRequest().authenticated()
                 )

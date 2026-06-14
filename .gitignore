@@ -31,3 +31,13 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Logs y crashes de JVM ###
+*.log
+hs_err_pid*
+replay_pid*
+
+### Sistema ###
+.DS_Store
+Thumbs.db
+Desktop.ini
