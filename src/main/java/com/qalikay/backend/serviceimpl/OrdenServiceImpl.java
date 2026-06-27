@@ -98,6 +98,11 @@ public class OrdenServiceImpl implements OrdenService {
         return ordenRepositorio.findById(id).orElse(null);
     }
 
+    @Override
+    public List<Orden> listarTodas() {
+        return ordenRepositorio.findAll();
+    }
+
     @Transactional
     @Override
     public Orden cambiarEstado(Long id, String estado) {

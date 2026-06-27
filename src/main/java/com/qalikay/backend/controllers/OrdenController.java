@@ -56,6 +56,15 @@ public class OrdenController {
         return ResponseEntity.ok(modelMapper.map(o, OrdenDTO.class));
     }
 
+    // GET /api/admin/ordenes -> ADMIN ve todas las ordenes (dashboard)
+    @GetMapping("/admin/ordenes")
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<OrdenDTO> listarTodasAdmin() {
+        return ordenService.listarTodas().stream()
+                .map(o -> modelMapper.map(o, OrdenDTO.class))
+                .collect(Collectors.toList());
+    }
+
     // POST /api/ordenes/{id}/estado -> ADMIN marca la orden como PAGADA / CANCELADA
     @PostMapping("/ordenes/{id}/estado")
     @PreAuthorize("hasRole('ADMIN')")

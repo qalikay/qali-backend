@@ -10,4 +10,5 @@ public interface OrdenService {
     List<Orden> listarMisOrdenes(String username);
     Orden buscarPorId(Long id);
     Orden cambiarEstado(Long id, String estado);
+    List<Orden> listarTodas();
 }

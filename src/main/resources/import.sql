@@ -123,6 +123,48 @@ INSERT INTO insumos (id, nombre, descripcion, precio, stock, unidad, tipo, image
 INSERT INTO insumos (id, nombre, descripcion, precio, stock, unidad, tipo, imagen_url, estado, categoria_id, experto_id) VALUES
     (8, 'Manzanilla',        'Flores secas de manzanilla, relajante y digestiva.',
         7.50,  90, 'paquete 50g', 'HIERBA', NULL, 'DISPONIBLE', 1, 1);
+INSERT INTO insumos (id, nombre, descripcion, precio, stock, unidad, tipo, imagen_url, estado, categoria_id, experto_id) VALUES
+    (9, 'Valeriana seca',    'Raiz seca de valeriana para infusiones relajantes y sueno reparador.',
+        14.00, 45, 'paquete 50g', 'HIERBA', NULL, 'DISPONIBLE', 1, 1);
+INSERT INTO insumos (id, nombre, descripcion, precio, stock, unidad, tipo, imagen_url, estado, categoria_id, experto_id) VALUES
+    (10, 'Toronjil',         'Hojas de toronjil (melisa) para calmar nervios y mejorar la digestion.',
+        9.00,  70, 'paquete 50g', 'HIERBA', NULL, 'DISPONIBLE', 1, 1);
+INSERT INTO insumos (id, nombre, descripcion, precio, stock, unidad, tipo, imagen_url, estado, categoria_id, experto_id) VALUES
+    (11, 'Quinua en hojuelas', 'Quinua organica de Cusco, superalimento andino rico en proteinas.',
+        18.00, 55, 'bolsa 500g', 'POLVO', NULL, 'DISPONIBLE', 1, 1);
+INSERT INTO insumos (id, nombre, descripcion, precio, stock, unidad, tipo, imagen_url, estado, categoria_id, experto_id) VALUES
+    (12, 'Kiwicha en hojuelas', 'Kiwicha (amaranto) andina, ideal para desayunos nutritivos.',
+        16.00, 40, 'bolsa 400g', 'POLVO', NULL, 'DISPONIBLE', 1, 1);
+INSERT INTO insumos (id, nombre, descripcion, precio, stock, unidad, tipo, imagen_url, estado, categoria_id, experto_id) VALUES
+    (13, 'Aceite de eucalipto', 'Aceite esencial de eucalipto para vaporizaciones y masajes.',
+        22.00, 35, 'frasco 15ml', 'ACEITE', NULL, 'DISPONIBLE', 5, 1);
+INSERT INTO insumos (id, nombre, descripcion, precio, stock, unidad, tipo, imagen_url, estado, categoria_id, experto_id) VALUES
+    (14, 'Aceite de lavanda', 'Aceite esencial de lavanda, relajante y aromatico.',
+        28.00, 28, 'frasco 15ml', 'ACEITE', NULL, 'DISPONIBLE', 5, 1);
+INSERT INTO insumos (id, nombre, descripcion, precio, stock, unidad, tipo, imagen_url, estado, categoria_id, experto_id) VALUES
+    (15, 'Tintura de propoleo', 'Extracto de propoleo andino, apoyo inmunologico natural.',
+        32.00, 20, 'frasco 30ml', 'EXTRACTO', NULL, 'DISPONIBLE', 4, 2);
+INSERT INTO insumos (id, nombre, descripcion, precio, stock, unidad, tipo, imagen_url, estado, categoria_id, experto_id) VALUES
+    (16, 'Extracto de chancapiedra', 'Planta tradicional para salud renal y hepatica.',
+        35.00, 18, 'frasco 50ml', 'EXTRACTO', NULL, 'DISPONIBLE', 4, 2);
+INSERT INTO insumos (id, nombre, descripcion, precio, stock, unidad, tipo, imagen_url, estado, categoria_id, experto_id) VALUES
+    (17, 'Cera de abeja natural', 'Cera de abeja pura para elaborar pomadas caseras.',
+        15.00, 50, 'bloque 100g', 'OTRO', NULL, 'DISPONIBLE', 2, 1);
+INSERT INTO insumos (id, nombre, descripcion, precio, stock, unidad, tipo, imagen_url, estado, categoria_id, experto_id) VALUES
+    (18, 'Arcilla verde',      'Arcilla medicinal andina para mascarillas faciales detox.',
+        12.00, 65, 'bolsa 200g', 'OTRO', NULL, 'DISPONIBLE', 6, 1);
+INSERT INTO insumos (id, nombre, descripcion, precio, stock, unidad, tipo, imagen_url, estado, categoria_id, experto_id) VALUES
+    (19, 'Paico seco',        'Hojas de paico, antiparasitario natural de uso tradicional.',
+        5.50,  110,'paquete 50g', 'HIERBA', NULL, 'DISPONIBLE', 1, 1);
+INSERT INTO insumos (id, nombre, descripcion, precio, stock, unidad, tipo, imagen_url, estado, categoria_id, experto_id) VALUES
+    (20, 'Hoja de coca en polvo', 'Polvo fino de hoja de coca para preparaciones energeticas.',
+        20.00, 15, 'bolsa 100g', 'POLVO', NULL, 'AGOTADO', 1, 1);
+INSERT INTO insumos (id, nombre, descripcion, precio, stock, unidad, tipo, imagen_url, estado, categoria_id, experto_id) VALUES
+    (21, 'Aceite de uña de gato', 'Aceite macerado de uña de gato, soporte articular.',
+        42.00, 12, 'frasco 30ml', 'ACEITE', NULL, 'DISPONIBLE', 5, 2);
+INSERT INTO insumos (id, nombre, descripcion, precio, stock, unidad, tipo, imagen_url, estado, categoria_id, experto_id) VALUES
+    (22, 'Resina de brea',    'Resina amazonica para unguentos y remedios tradicionales.',
+        18.00, 8,  'frasco 20g', 'OTRO', NULL, 'AGOTADO', 4, 2);
 
 
 -- ============================================================
@@ -310,20 +352,18 @@ INSERT INTO resenas (id, calificacion, comentario, tipo_item, item_id, fecha_cre
 
 
 -- ============================================================
--- AJUSTE DE SECUENCIAS  (PostgreSQL IDENTITY)
--- Indispensable: como insertamos IDs manuales, hay que adelantar
--- la secuencia para que los proximos INSERT autogenerados no choquen.
+-- AJUSTE DE SECUENCIAS (H2)
 -- ============================================================
-SELECT setval(pg_get_serial_sequence('roles',          'id'), (SELECT MAX(id) FROM roles));
-SELECT setval(pg_get_serial_sequence('users',          'id'), (SELECT MAX(id) FROM users));
-SELECT setval(pg_get_serial_sequence('especialidades', 'id'), (SELECT MAX(id) FROM especialidades));
-SELECT setval(pg_get_serial_sequence('categorias',     'id'), (SELECT MAX(id) FROM categorias));
-SELECT setval(pg_get_serial_sequence('clientes',       'id'), (SELECT MAX(id) FROM clientes));
-SELECT setval(pg_get_serial_sequence('expertos',       'id'), (SELECT MAX(id) FROM expertos));
-SELECT setval(pg_get_serial_sequence('insumos',        'id'), (SELECT MAX(id) FROM insumos));
-SELECT setval(pg_get_serial_sequence('recetas',        'id'), (SELECT MAX(id) FROM recetas));
-SELECT setval(pg_get_serial_sequence('consultas',      'id'), (SELECT MAX(id) FROM consultas));
-SELECT setval(pg_get_serial_sequence('mensajes',       'id'), (SELECT MAX(id) FROM mensajes));
-SELECT setval(pg_get_serial_sequence('ordenes',        'id'), (SELECT MAX(id) FROM ordenes));
-SELECT setval(pg_get_serial_sequence('detalle_orden',  'id'), (SELECT MAX(id) FROM detalle_orden));
-SELECT setval(pg_get_serial_sequence('resenas',        'id'), (SELECT MAX(id) FROM resenas));
+ALTER TABLE roles ALTER COLUMN id RESTART WITH 4;
+ALTER TABLE users ALTER COLUMN id RESTART WITH 6;
+ALTER TABLE especialidades ALTER COLUMN id RESTART WITH 5;
+ALTER TABLE categorias ALTER COLUMN id RESTART WITH 7;
+ALTER TABLE clientes ALTER COLUMN id RESTART WITH 3;
+ALTER TABLE expertos ALTER COLUMN id RESTART WITH 3;
+ALTER TABLE insumos ALTER COLUMN id RESTART WITH 23;
+ALTER TABLE recetas ALTER COLUMN id RESTART WITH 9;
+ALTER TABLE consultas ALTER COLUMN id RESTART WITH 4;
+ALTER TABLE mensajes ALTER COLUMN id RESTART WITH 9;
+ALTER TABLE ordenes ALTER COLUMN id RESTART WITH 4;
+ALTER TABLE detalle_orden ALTER COLUMN id RESTART WITH 7;
+ALTER TABLE resenas ALTER COLUMN id RESTART WITH 6;
