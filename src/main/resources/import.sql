@@ -6,7 +6,7 @@
 --   admin   / admin123
 --   cliente / cliente123
 --   cliente2 / cliente123
---   experto / experto123
+--   experto / 
 --   experto2 / experto123
 -- ============================================================
 

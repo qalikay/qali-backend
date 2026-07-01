@@ -13,7 +13,7 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=admin
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/db_productos
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/qalikay_db
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=admin
       - SPRING_JPA_HIBERNATE_DDL_AUTO=create-drop
@@ -28,7 +28,7 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=admin
-      - POSTGRES_DB=db_productos
+      - POSTGRES_DB=qalikay_db
     ports:
       - "5433:5432"
 volumes:
