@@ -88,7 +88,7 @@ INSERT INTO clientes (id, nombres, apellidos, telefono, user_id) VALUES
 -- ============================================================
 INSERT INTO expertos (id, nombres, apellidos, telefono, trayectoria, anos_experiencia, especialidad_id, user_id) VALUES
     (1, 'Rosa',  'Huaman Ccahuana', '988111222',
-        'Curandera andina con 20 anos preparando infusiones, pomadas y jarabes tradicionales en la sierra de Cusco.',
+        'Curandera andina con 20 años preparando infusiones, pomadas y jarabes tradicionales en la sierra de Cusco.',
         20, 1, 4);
 INSERT INTO expertos (id, nombres, apellidos, telefono, trayectoria, anos_experiencia, especialidad_id, user_id) VALUES
     (2, 'Pedro', 'Vargas Shipibo',  '988333444',
@@ -271,7 +271,7 @@ INSERT INTO consultas (id, asunto, estado, fecha_creacion, cliente_id, experto_i
 -- MENSAJES (de cada consulta)
 -- ============================================================
 INSERT INTO mensajes (id, contenido, remitente, fecha_envio, consulta_id) VALUES
-    (1, 'Hola, quisiera saber si puedo darle infusion de muna a mi hijo de 8 anos para los gases.',
+    (1, 'Hola, quisiera saber si puedo darle infusion de muna a mi hijo de 8 años para los gases.',
         'CLIENTE', '2025-11-10 10:30:00', 1);
 INSERT INTO mensajes (id, contenido, remitente, fecha_envio, consulta_id) VALUES
     (2, 'Hola Maria, si puedes darle media taza tibia, una vez al dia despues del almuerzo. No mas de 3 dias seguidos.',
